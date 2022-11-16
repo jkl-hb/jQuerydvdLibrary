@@ -18,49 +18,60 @@
 
 <body>
     <div class="container">
-        <div class="row">
-            <div id="createMenu">
-                <button type="button" id="createButton" class="btn btn-primary">
-                    Create Dvd
-                </button>
-            </div>
-            <div id="searchMenu" class="row" style="margin-left: auto; margin-right: 0;">
-                <div>
-                    <button type="button" id="searchButton" class="btn btn-primary">
-                        Search
+        <div id="mainPageDiv">
+            <div class="row">
+                <div id="createMenu">
+                    <button type="button" id="createButton" class="btn btn-primary">
+                        Create Dvd
                     </button>
                 </div>
-                <div class="dropdown">
-                    <form name="form1" id="form1" action="/action_page.php">
-                        <select name="subject" id="subject">
-                            <option value="" selected="selected">Search Category</option>
+                <div id="searchMenu" class="row" style="margin-left: auto; margin-right: 0;">
+                    <div>
+                        <button type="button" id="searchButton" class="btn btn-primary">
+                            Search
+                        </button>
+                    </div>
+                    <div class="dropdown">
+                        <select id="searchCategory" required>
+                            <option value="none" selected disabled hidden>Search Category</option>
+                            <option value="title">Title</option>
+                            <option value="year">Release Year</option>
+                            <option value="director">Director</option>
+                            <option value="rating">Rating</option>
                         </select>
-                        <br><br>
-                    </form>
+                    </div>
+                    <div class="searchbar">
+                        <input id="searchfield" type="text" placeholder="Search Term" required>
+                    </div>
                 </div>
-                <div class="searchbar">
-                    <input type="text" placeholder="Search">
-                </div>
+            </div>
+
+            <hr>
+
+            <ul class="list-group" id="errorMessages"></ul>
+
+            <div id="dvdTableDiv">
+                <table id="dvdTable" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th width="30%">Title</th>
+                            <th width="30%">Release Date</th>
+                            <th width="15%">Director</th>
+                            <th width="15%">Rating</th>
+                            <th width="15%"></th>
+                            <th width="15%"></th>
+                        </tr>
+                    </thead>
+                    <!-- we will add data rows dynamically to the tbody -->
+                    <tbody id="contentRows"></tbody>
+                </table>
             </div>
         </div>
 
-        <hr>
-
-        <div id="dvdTableDiv">
-            <table id="dvdTable" class="table table-hover">
-                <thead>
-                    <tr>
-                        <th width="30%">Title</th>
-                        <th width="30%">Release Date</th>
-                        <th width="15%">Director</th>
-                        <th width="15%">Rating</th>
-                        <th width="15%"></th>
-                        <th width="15%"></th>
-                    </tr>
-                </thead>
-                <!-- we will add data rows dynamically to the tbody -->
-                <tbody id="contentRows"></tbody>
-            </table>
+        <div id="dvdDetailsDiv">
+            <h1 id="detailsTitle">Title</h1>
+            <hr>
+            <div id="detailsBody"></div>
         </div>
 
     </div>
