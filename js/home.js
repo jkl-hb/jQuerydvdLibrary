@@ -43,7 +43,7 @@ function search() {
     $('#searchButton').click(function (event) {
         var haveValidationErrors = checkAndDisplayValidationErrors($('#searchMenu').find('select,input'));
         var searchCategory = $('#searchCategory').val();
-        var pathVar = $('#searchfield').val();
+        var searchField = $('#searchfield').val();
 
         if (haveValidationErrors) {
             return false;
@@ -51,7 +51,7 @@ function search() {
 
         $.ajax({
             type: 'GET',
-            url: 'http://dvd-library.us-east-1.elasticbeanstalk.com/dvds/' + searchCategory + '/' + pathVar,
+            url: 'http://dvd-library.us-east-1.elasticbeanstalk.com/dvds/' + searchCategory + '/' + searchField,
             success: function (dvdArray) {
                 $.each(dvdArray, function (index, dvd) {
                     var title = dvd.title;
@@ -59,7 +59,7 @@ function search() {
                     var director = dvd.director;
                     var rating = dvd.rating;
                     var notes = dvd.notes;
-                    var dvdId = dvd.dvdId;
+                    var dvdId = dvd.id;
                 })
             },
             error: function () {
