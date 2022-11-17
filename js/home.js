@@ -1,9 +1,9 @@
 $(document).ready(function () {
     loadDvds();
-    addDvd();
     search();
     $('#dvdDetailsDiv').hide();
     $('#editDiv').hide();
+    $('#addDiv').hide();
 });
 
 function loadDvds() {
@@ -26,7 +26,7 @@ function loadDvds() {
                 row += '<td>' + releaseYear + '</td>';
                 row += '<td>' + director + '</td>';
                 row += '<td>' + rating + '</td>';
-                row += '<td><button type="button" class="btn btn-info" >Edit</button></td>';
+                row += '<td><button type="button" class="btn btn-info" onclick="showEditForm(' + dvdId + ')>Edit</button></td>';
                 row += '<td><button type="button" class="btn btn-info" onclick="deleteDvd(' + dvdId + ')">Delete</button></td>';
                 row += '</tr>';
 
@@ -70,7 +70,7 @@ function search() {
                     row += '<td>' + releaseYear + '</td>';
                     row += '<td>' + director + '</td>';
                     row += '<td>' + rating + '</td>';
-                    row += '<td><button type="button" class="btn btn-info" >Edit</button></td>';
+                    row += '<td><button type="button" class="btn btn-info" onclick="showEditForm(' + dvdId + ')">Edit</button></td>';
                     row += '<td><button type="button" class="btn btn-info" onclick="deleteDvd(' + dvdId + ')">Delete</button></td>';
                     row += '</tr>';
 
@@ -155,29 +155,29 @@ function deleteDvd(dvdId) {
 }
 
 function editDvd(dvdId) {
-    var editBody = $('#editBody');
-    $('#mainPageDiv').hide();
-    $('#editDiv').show();
-
     $.ajax({
         type: 'PUT',
         url: 'http://dvd-library.us-east-1.elasticbeanstalk.com/dvd/' + dvdId,
-        success: function (dvd) {
-            var title = dvd.title;
-            var releaseYear = dvd.releaseYear;
-            var director = dvd.director;
-            var rating = dvd.rating;
-            var notes = dvd.notes;
-
-            $('#editTitle').text(title);
-            var body = '<p>';
-            body += '<p>Release Year: ' + releaseYear + '</p>';
-            body += '<p>Director: ' + director + '</p>';
-            body += '<p>Rating: ' + rating + '</p>';
-            body += '<p>Notes: ' + notes + '</p>';
-            body += '</p>';
-
-            editBody.append(body);
+        data: JSON.stringify({
+            title: $('#editTitle').val(),
+            releaseYear: $('#editReleaseYear').val(),
+            director: $('#editDirector').val(),
+            rating: $('#editRating').val(),
+            notes: $('#editNotes').val()
+        }),
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        'dataType': 'json',
+        success: function () {
+            $('#errorMessages').empty();
+            $('#editTitle').val('');
+            $('#editReleaseYear').val('');
+            $('#editDirector').val('');
+            $('#editRating').val('');
+            $('#editNotes').val('');
+            loadDvds();
         },
         error: function () {
             $('#errorMessages')
@@ -186,49 +186,89 @@ function editDvd(dvdId) {
                     .text('Error calling web service. Please try again later.'));
         }
     });
+    hideEditForm();
+}
+
+function showEditForm(dvdId) {
+    $('#errorMessages').empty();
+
+    $.ajax({
+        type: 'GET',
+        url: 'http://dvd-library.us-east-1.elasticbeanstalk.com/dvd/' + dvdId,
+        success: function (dvd, status) {
+            $('#editHeader').text("Edit DVD: " + dvd.title);
+            $('#editTitle').val(dvd.title);
+            $('#editReleaseYear').val(dvd.releaseYear);
+            $('#editDirector').val(dvd.director);
+            $('#editRating').val(dvd.rating);
+            $('#editNotes').val(dvd.notes);
+            $('#editSaveButton').attr({class: 'onclick="editDvd()"' });
+        },
+        error: function () {
+            $('#errorMessages')
+                .append($('<li>')
+                    .attr({ class: 'list-group-item list-group-item-danger' })
+                    .text('Error calling web service. Please try again later.'));
+        }
+    })
+
+    $('#mainPageDiv').hide();
+    $('#editDiv').show();
 }
 
 function hideEditForm() {
     $('#editTitle').empty();
-    $('#editBody').empty();
+    $('#editForm').empty();
     $('#editDiv').hide();
     $('#mainPageDiv').show();
 }
 
 function addDvd() {
-    $('#createButton').click(function (event) {
-        $.ajax({
-            type: 'POST',
-            url: 'http://dvd-library.us-east-1.elasticbeanstalk.com/dvd',
-            data: JSON.stringify({
-                title: $('#addDVDTitle').val(),
-                releaseYear: $('#addReleaseYear').val(),
-                director: $('#addDirector').val(),
-                rating: $('#addRating').val(),
-                notes: $('#addNotes').val()
-            }),
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            'dataType': 'json',
-            success: function () {
-                $('#errorMessages').empty();
-                $('#addDVDTitle').val('');
-                $('#addReleaseYear').val('');
-                $('#addDirector').val('');
-                $('#addRating').val('');
-                $('#addNotes').val('');
-                loadDvds();
-            },
-            error: function () {
-                $('#errorMessages')
-                    .append($('<li>')
-                        .attr({ class: 'list-group-item list-group-item-danger' })
-                        .text('Error calling web service. Please try again later.'));
-            }
-        })
-    });
+    $.ajax({
+        type: 'GET',
+        url: 'http://dvd-library.us-east-1.elasticbeanstalk.com/dvd',
+        data: JSON.stringify({
+            title: $('#addTitle').val(),
+            releaseYear: $('#addReleaseYear').val(),
+            director: $('#addDirector').val(),
+            rating: $('#addRating').val(),
+            notes: $('#addNotes').val()
+        }),
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        'dataType': 'json',
+        success: function () {
+            $('#errorMessages').empty();
+            $('#addTitle').val('');
+            $('#addReleaseYear').val('');
+            $('#addDirector').val('');
+            $('#addRating').val('');
+            $('#addNotes').val('');
+            loadDvds();
+        },
+        error: function () {
+            $('#errorMessages')
+                .append($('<li>')
+                    .attr({ class: 'list-group-item list-group-item-danger' })
+                    .text('Error calling web service. Please try again later.'));
+        }
+    })
+    hideAddForm();
+}
+
+function showAddForm() {
+    $('#errorMessages').empty();
+    $('#mainPageDiv').hide();
+    $('#addDiv').show();
+}
+
+function hideAddForm() {
+    $('#addTitle').empty();
+    $('#addForm').empty();
+    $('#addDiv').hide();
+    $('#mainPageDiv').show();
 }
 
 function clearDvdTable() {
