@@ -24,7 +24,7 @@ function loadDvds() {
                 row += '<td>' + director + '</td>';
                 row += '<td>' + rating + '</td>';
                 row += '<td><button type="button" class="btn btn-info" >Edit</button></td>';
-                row += '<td><button type="button" class="btn btn-info" >Delete</button></td>';
+                row += '<td><button type="button" class="btn btn-info" onclick="deleteDvd(' + dvdId + ')">Delete</button></td>';
                 row += '</tr>';
 
                 contentRows.append(row);
@@ -74,7 +74,6 @@ function search() {
 
 function viewDetails(dvdId) {
     var detailsBody = $('#detailsBody');
-    detailsBody.empty();
     $('#mainPageDiv').hide();
     $('#dvdDetailsDiv').show();
 
@@ -108,8 +107,35 @@ function viewDetails(dvdId) {
 }
 
 function back() {
+    $('#detailsBody').empty();
     $('#dvdDetailsDiv').hide();
     $('#mainPageDiv').show();
+}
+
+function deleteDvd(dvdId) {
+    $.confirm({
+        title: 'Delete DVD',
+        content: 'Are you sure you want to delete this DVD from your collection?',
+        buttons: {
+            confirm: function () {
+                $.ajax({
+                    type: 'DELETE',
+                    url: 'http://dvd-library.us-east-1.elasticbeanstalk.com/dvd/' + dvdId,
+                    success: function () {
+                        loadDvds();
+                    },
+                    error: function () {
+                        $('#errorMessages')
+                            .append($('<li>')
+                                .attr({ class: 'list-group-item list-group-item-danger' })
+                                .text('Error calling web service. Please try again later.'));
+                    }
+                });
+            },
+            cancel: function () {
+            }
+        }
+    });
 }
 
 function checkAndDisplayValidationErrors(input) {
