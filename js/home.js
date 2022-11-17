@@ -3,6 +3,7 @@ $(document).ready(function () {
     addDvd();
     search();
     $('#dvdDetailsDiv').hide();
+    $('#editDiv').hide();
 });
 
 function loadDvds() {
@@ -45,6 +46,8 @@ function search() {
         var haveValidationErrors = checkAndDisplayValidationErrors($('#searchMenu').find('select,input'));
         var searchCategory = $('#searchCategory').val();
         var searchField = $('#searchfield').val();
+        var contentRows = $('#contentRows');
+        contentRows.clear();
 
         if (haveValidationErrors) {
             return false;
@@ -59,8 +62,18 @@ function search() {
                     var releaseYear = dvd.releaseYear;
                     var director = dvd.director;
                     var rating = dvd.rating;
-                    var notes = dvd.notes;
                     var dvdId = dvd.id;
+
+                    var row = '<tr>';
+                    row += '<td><a href="#" onclick="viewDetails(' + dvdId + ')">' + title + '</td>';
+                    row += '<td>' + releaseYear + '</td>';
+                    row += '<td>' + director + '</td>';
+                    row += '<td>' + rating + '</td>';
+                    row += '<td><button type="button" class="btn btn-info" >Edit</button></td>';
+                    row += '<td><button type="button" class="btn btn-info" onclick="deleteDvd(' + dvdId + ')">Delete</button></td>';
+                    row += '</tr>';
+
+                    contentRows.append(row);
                 })
             },
             error: function () {
@@ -89,14 +102,14 @@ function viewDetails(dvdId) {
             var notes = dvd.notes;
 
             $('#detailsTitle').text(title);
-            var detail = '<p>';
-            detail += '<p>Release Year: ' + releaseYear + '</p>';
-            detail += '<p>Director: ' + director + '</p>';
-            detail += '<p>Rating: ' + rating + '</p>';
-            detail += '<p>Notes: ' + notes + '</p>';
-            detail += '</p>';
+            var body = '<p>';
+            body += '<p>Release Year: ' + releaseYear + '</p>';
+            body += '<p>Director: ' + director + '</p>';
+            body += '<p>Rating: ' + rating + '</p>';
+            body += '<p>Notes: ' + notes + '</p>';
+            body += '</p>';
 
-            detailsBody.append(detail);
+            detailsBody.append(body);
         },
         error: function () {
             $('#errorMessages')
@@ -107,7 +120,8 @@ function viewDetails(dvdId) {
     });
 }
 
-function back() {
+function hideDetails() {
+    $('#detailsTitle').empty();
     $('#detailsBody').empty();
     $('#dvdDetailsDiv').hide();
     $('#mainPageDiv').show();
@@ -115,7 +129,7 @@ function back() {
 
 function deleteDvd(dvdId) {
     $.confirm({
-        title: 'Delete DVD',
+        title: 'Confirmation',
         content: 'Are you sure you want to delete this DVD from your collection?',
         buttons: {
             confirm: function () {
@@ -137,6 +151,47 @@ function deleteDvd(dvdId) {
             }
         }
     });
+}
+
+function editDvd(dvdId) {
+    var editBody = $('#editBody');
+    $('#mainPageDiv').hide();
+    $('#editDiv').show();
+
+    $.ajax({
+        type: 'PUT',
+        url: 'http://dvd-library.us-east-1.elasticbeanstalk.com/dvd/' + dvdId,
+        success: function (dvd) {
+            var title = dvd.title;
+            var releaseYear = dvd.releaseYear;
+            var director = dvd.director;
+            var rating = dvd.rating;
+            var notes = dvd.notes;
+
+            $('#editTitle').text(title);
+            var body = '<p>';
+            body += '<p>Release Year: ' + releaseYear + '</p>';
+            body += '<p>Director: ' + director + '</p>';
+            body += '<p>Rating: ' + rating + '</p>';
+            body += '<p>Notes: ' + notes + '</p>';
+            body += '</p>';
+
+            editBody.append(body);
+        },
+        error: function () {
+            $('#errorMessages')
+                .append($('<li>')
+                    .attr({ class: 'list-group-item list-group-item-danger' })
+                    .text('Error calling web service. Please try again later.'));
+        }
+    });
+}
+
+function hideEditForm() {
+    $('#editTitle').empty();
+    $('#editBody').empty();
+    $('#editDiv').hide();
+    $('#mainPageDiv').show();
 }
 
 function checkAndDisplayValidationErrors(input) {
