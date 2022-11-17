@@ -177,7 +177,7 @@ function clearDVDMenu() {
         $('#createButton').click(function (event) {
             $.ajax({
                type: 'POST',
-               url: 'http://dvd-library.us-east-1.elasticbeanstalk.com/dvds',
+               url: 'http://dvd-library.us-east-1.elasticbeanstalk.com/dvd',
                data: JSON.stringify({
                     title: $('#addDVDTitle').val(),
                     releaseYear: $('#addReleaseYear').val(),
