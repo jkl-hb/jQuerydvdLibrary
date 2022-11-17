@@ -27,9 +27,7 @@
                 </div>
                 <div id="searchMenu" class="row" style="margin-left: auto; margin-right: 0;">
                     <div>
-                        <button type="button" id="searchButton" class="btn btn-primary">
-                            Search
-                        </button>
+                        <button type="button" id="searchButton" class="btn btn-primary">Search</button>
                     </div>
                     <div class="dropdown">
                         <select id="searchCategory" required>
@@ -69,9 +67,12 @@
         </div>
 
         <div id="dvdDetailsDiv">
-            <h1 id="detailsTitle">Title</h1>
+            <h1 id="detailsTitle"></h1>
             <hr>
             <div id="detailsBody"></div>
+            <div>
+                <button type="button" id="backButton" class="btn btn-primary" onclick="back()">Back</button>
+            </div>
         </div>
 
     </div>

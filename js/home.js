@@ -1,6 +1,7 @@
 $(document).ready(function () {
     loadDvds();
     search();
+    $('#dvdDetailsDiv').hide();
 });
 
 function loadDvds() {
@@ -15,12 +16,10 @@ function loadDvds() {
                 var releaseYear = dvd.releaseYear;
                 var director = dvd.director;
                 var rating = dvd.rating;
-                var notes = dvd.notes;
-                var dvdId = dvd.dvdId;
+                var dvdId = dvd.id;
 
                 var row = '<tr>';
-                row += '<input type="hidden" id="viewDvdId">' + dvdId;
-                row += '<td><a href="" id="titleLink">' + title + '</a></td>';
+                row += '<td><a href="#" onclick="viewDetails(' + dvdId + ')">' + title + '</td>';
                 row += '<td>' + releaseYear + '</td>';
                 row += '<td>' + director + '</td>';
                 row += '<td>' + rating + '</td>';
@@ -73,44 +72,44 @@ function search() {
     });
 }
 
-function viewDetails() {
-    $("#titleLink").click(function(){
-        $('#mainPageDiv').hide();
-        $('#dvdDetailsDiv').show();
-        var pathVar = $('#viewDvdId').val()
-        var detailsBody = $('#detailsBody');
+function viewDetails(dvdId) {
+    var detailsBody = $('#detailsBody');
+    detailsBody.empty();
+    $('#mainPageDiv').hide();
+    $('#dvdDetailsDiv').show();
 
-        $.ajax({
-            type: 'GET',
-            url: 'http://dvd-library.us-east-1.elasticbeanstalk.com/dvd/' + pathVar,
-            success: function (dvdArray) {
-                $.each(dvdArray, function (index, dvd) {
-                    var title = dvd.title;
-                    var releaseYear = dvd.releaseYear;
-                    var director = dvd.director;
-                    var rating = dvd.rating;
-                    var notes = dvd.notes;
-                    var dvdId = dvd.dvdId;
-    
-                    $('#detailsTitle').text(title);
-                    var detail = '<p>';
-                    detail += '<p>' + releaseYear + '/<p>';
-                    detail += '<p>' + director + '</p>';
-                    detail += '<p>' + rating + '</p>';
-                    detail += '<p>' + notes + '</p>';
-                    detail += '<p>';
-    
-                    detailsBody.append(detail);
-                })
-            },
-            error: function () {
-                $('#errorMessages')
-                    .append($('<li>')
-                        .attr({ class: 'list-group-item list-group-item-danger' })
-                        .text('Error calling web service. Please try again later.'));
-            }
-        });
+    $.ajax({
+        type: 'GET',
+        url: 'http://dvd-library.us-east-1.elasticbeanstalk.com/dvd/' + dvdId,
+        success: function (dvd) {
+            var title = dvd.title;
+            var releaseYear = dvd.releaseYear;
+            var director = dvd.director;
+            var rating = dvd.rating;
+            var notes = dvd.notes;
+
+            $('#detailsTitle').text(title);
+            var detail = '<p>';
+            detail += '<p>Release Year: ' + releaseYear + '</p>';
+            detail += '<p>Director: ' + director + '</p>';
+            detail += '<p>Rating: ' + rating + '</p>';
+            detail += '<p>Notes: ' + notes + '</p>';
+            detail += '</p>';
+
+            detailsBody.append(detail);
+        },
+        error: function () {
+            $('#errorMessages')
+                .append($('<li>')
+                    .attr({ class: 'list-group-item list-group-item-danger' })
+                    .text('Error calling web service. Please try again later.'));
+        }
     });
+}
+
+function back() {
+    $('#dvdDetailsDiv').hide();
+    $('#mainPageDiv').show();
 }
 
 function checkAndDisplayValidationErrors(input) {
